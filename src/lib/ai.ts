@@ -1,4 +1,6 @@
-import { StoryRequirement, storyRequirements } from '@/config';
+import { storyRequirements } from '@/config';
+
+import { StoryRequirement } from '@/types';
 
 function buildStoryRequirements(config: StoryRequirement): (string | number)[] {
   if (config.options.length === 0) {
@@ -31,14 +33,23 @@ function formatTemplate(
   return formatted;
 }
 
-export function builtPrompt(
-  targetLanguage: string,
-  storyLength: number,
-  difficultyLevel: string,
-  topic: string,
-  includeVocabulary: boolean = false,
-  includeGrammarTips: boolean = false
-) {
+export type BuiltPromptParams = {
+  targetLanguage: string;
+  storyLength: number;
+  difficultyLevel: string;
+  topic: string;
+  includeVocabulary: boolean;
+  includeGrammarTips: boolean;
+};
+
+export function buildPrompt({
+  targetLanguage,
+  storyLength,
+  difficultyLevel,
+  topic,
+  includeVocabulary,
+  includeGrammarTips,
+}: BuiltPromptParams) {
   const randomValues: Record<string, (string | number)[]> = {};
   const storyRequirementsList: string[] = [];
 

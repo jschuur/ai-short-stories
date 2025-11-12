@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 
-import { difficultyLevels, languages, topicIdeas } from '@/config';
+import { difficultyLevels, getRandomTopic, languages } from '@/config';
 import { env } from '@/env';
 
 interface StoryFormProps {
@@ -31,10 +31,6 @@ interface StoryFormProps {
   }) => Promise<void>;
   isLoading: boolean;
 }
-
-const getRandomTopic = () => {
-  return topicIdeas[Math.floor(Math.random() * topicIdeas.length)];
-};
 
 export function StoryForm({ onSubmit, isLoading }: StoryFormProps) {
   const [targetLanguage, setTargetLanguage] = useState(env.NEXT_PUBLIC_DEFAULT_TARGET_LANGUAGE);

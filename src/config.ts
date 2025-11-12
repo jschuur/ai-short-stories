@@ -1,3 +1,5 @@
+import { StoryRequirements } from '@/types';
+
 export const difficultyLevels: Record<string, string> = {
   A1: 'A1 (beginners)',
   A2: 'A2 (pre-intermediate)',
@@ -50,13 +52,9 @@ export const topicIdeas = [
   'A gardener witnesses the changing seasons and reflects on life',
 ];
 
-export type StoryRequirement = {
-  count: number;
-  options: (string | number)[];
-  template: string;
-  label?: string;
+export const getRandomTopic = () => {
+  return topicIdeas[Math.floor(Math.random() * topicIdeas.length)];
 };
-export type StoryRequirements = Record<string, StoryRequirement>;
 
 export const storyRequirements: StoryRequirements = {
   tones: {
