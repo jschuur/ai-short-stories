@@ -3,7 +3,7 @@ import { streamText } from 'ai';
 
 import { builtPrompt } from '@/lib/ai';
 
-import { ANTHROPIC_MODEL } from '@/config';
+import { env } from '@/env';
 
 export async function POST(req: Request) {
   try {
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     );
 
     const result = streamText({
-      model: anthropic(ANTHROPIC_MODEL),
+      model: anthropic(env.ANTHROPIC_MODEL),
       prompt,
     });
 

@@ -116,4 +116,4 @@ export const storyRequirements: StoryRequirements = {
   },
 };
 
-export const ANTHROPIC_MODEL = 'claude-sonnet-4-5-20250929';
+export const defaultAnthropicModel = 'claude-sonnet-4-5-20250929';
