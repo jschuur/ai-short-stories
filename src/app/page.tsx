@@ -59,7 +59,7 @@ export default function Home() {
   };
 
   return (
-    <div className='min-h-screen bg-linear-to-b from-zinc-50 to-zinc-100 py-12 px-4 dark:from-zinc-900 dark:to-zinc-950'>
+    <div className='min-h-screen bg-linear-to-b from-blue-50 to-blue-100 py-12 px-4 dark:from-indigo-900 dark:to-fuchsia-950'>
       <div className='mx-auto max-w-4xl'>
         <div className='mb-8 text-center'>
           <h1 className='mb-2 text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50'>
