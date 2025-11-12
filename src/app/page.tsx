@@ -49,7 +49,7 @@ export default function Home() {
       <div className='mx-auto max-w-4xl'>
         <div className='mb-8 text-center'>
           <h1 className='mb-2 text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50'>
-            Learning with Stories
+            Bite Sized Stories
           </h1>
           <p className='text-lg text-zinc-600 dark:text-zinc-400'>
             Generate custom short stories to practice a new language

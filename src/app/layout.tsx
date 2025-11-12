@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'AI Short Stories',
+  title: 'Bite Sized Stories',
   description: 'Practice a new language with random short stories',
 };
 

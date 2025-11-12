@@ -9,7 +9,17 @@ export const difficultyLevels: Record<string, string> = {
   C2: 'C2 (proficiency)',
 };
 
-export const languages = ['German', 'Dutch', 'French', 'Spanish'];
+export const languages = [
+  'German',
+  'Dutch',
+  'French',
+  'Spanish',
+  'English',
+  'Italian',
+  'Portuguese',
+  'Chinese',
+  'Ukrainian',
+];
 export const defaultLanguage = 'Dutch';
 
 export const defaultStoryLength = 100;
