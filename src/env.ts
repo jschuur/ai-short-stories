@@ -6,6 +6,8 @@ import {
   defaultAnthropicModel,
   defaultDifficultyLevel,
   defaultStoryLength,
+  defaultStoryLengthMax,
+  defaultStoryLengthMin,
   defaultTargetLanguage,
 } from '@/config';
 
@@ -18,6 +20,8 @@ export const env = createEnv({
   client: {
     NEXT_PUBLIC_DEFAULT_TARGET_LANGUAGE: z.string().min(1).default(defaultTargetLanguage),
     NEXT_PUBLIC_DEFAULT_STORY_LENGTH: z.coerce.number().default(defaultStoryLength),
+    NEXT_PUBLIC_DEFAULT_STORY_LENGTH_MIN: z.coerce.number().default(defaultStoryLengthMin),
+    NEXT_PUBLIC_DEFAULT_STORY_LENGTH_MAX: z.coerce.number().default(defaultStoryLengthMax),
     NEXT_PUBLIC_DEFAULT_DIFFICULTY_LEVEL: z.string().min(1).default(defaultDifficultyLevel),
     NEXT_PUBLIC_DEFAULT_TOPIC: z.string().optional(),
     NEXT_PUBLIC_DEFAULT_INCLUDE_VOCABULARY: z.preprocess((val) => {
@@ -40,6 +44,8 @@ export const env = createEnv({
   experimental__runtimeEnv: {
     NEXT_PUBLIC_DEFAULT_TARGET_LANGUAGE: process.env.NEXT_PUBLIC_DEFAULT_TARGET_LANGUAGE,
     NEXT_PUBLIC_DEFAULT_STORY_LENGTH: process.env.NEXT_PUBLIC_DEFAULT_STORY_LENGTH,
+    NEXT_PUBLIC_DEFAULT_STORY_LENGTH_MIN: process.env.NEXT_PUBLIC_DEFAULT_STORY_LENGTH_MIN,
+    NEXT_PUBLIC_DEFAULT_STORY_LENGTH_MAX: process.env.NEXT_PUBLIC_DEFAULT_STORY_LENGTH_MAX,
     NEXT_PUBLIC_DEFAULT_DIFFICULTY_LEVEL: process.env.NEXT_PUBLIC_DEFAULT_DIFFICULTY_LEVEL,
     NEXT_PUBLIC_DEFAULT_TOPIC: process.env.NEXT_PUBLIC_DEFAULT_TOPIC,
     NEXT_PUBLIC_DEFAULT_INCLUDE_VOCABULARY: process.env.NEXT_PUBLIC_DEFAULT_INCLUDE_VOCABULARY,

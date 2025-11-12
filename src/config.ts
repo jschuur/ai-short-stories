@@ -22,6 +22,8 @@ export const languages = [
 export const defaultTargetLanguage = 'Dutch';
 
 export const defaultStoryLength = 100;
+export const defaultStoryLengthMin = 20;
+export const defaultStoryLengthMax = 1000;
 
 export const topicIdeas = [
   'A story about a journey to a new country',

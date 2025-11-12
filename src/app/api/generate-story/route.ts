@@ -20,6 +20,13 @@ export async function POST(req: Request) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), { status: 400 });
     }
 
+    // Clamp story length to min/max bounds
+    const numStoryLength = parseInt(String(storyLength), 10);
+    const clampedStoryLength = Math.max(
+      env.NEXT_PUBLIC_DEFAULT_STORY_LENGTH_MIN,
+      Math.min(env.NEXT_PUBLIC_DEFAULT_STORY_LENGTH_MAX, numStoryLength)
+    );
+
     // Force disable if env vars are set
     const finalIncludeVocabulary = env.NEXT_PUBLIC_DISABLE_VOCABULARY_CHECKBOX
       ? false
@@ -30,7 +37,7 @@ export async function POST(req: Request) {
 
     const prompt = builtPrompt(
       targetLanguage,
-      storyLength,
+      clampedStoryLength,
       difficultyLevel,
       topic,
       finalIncludeVocabulary,

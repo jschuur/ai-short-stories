@@ -52,6 +52,27 @@ export function StoryForm({ onSubmit, isLoading }: StoryFormProps) {
   );
   const [error, setError] = useState('');
 
+  const handleStoryLengthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setStoryLength(e.target.value);
+  };
+
+  const handleStoryLengthBlur = () => {
+    if (storyLength === '') {
+      return;
+    }
+
+    const numValue = parseInt(storyLength, 10);
+
+    if (!isNaN(numValue)) {
+      const clamped = Math.max(
+        env.NEXT_PUBLIC_DEFAULT_STORY_LENGTH_MIN,
+        Math.min(env.NEXT_PUBLIC_DEFAULT_STORY_LENGTH_MAX, numValue)
+      );
+
+      setStoryLength(clamped.toString());
+    }
+  };
+
   const handleSubmit = async () => {
     if (!targetLanguage || !storyLength || !difficultyLevel || !topic) {
       setError('Please fill in all fields');
@@ -106,7 +127,10 @@ export function StoryForm({ onSubmit, isLoading }: StoryFormProps) {
               id='length'
               type='number'
               value={storyLength}
-              onChange={(e) => setStoryLength(e.target.value)}
+              max={env.NEXT_PUBLIC_DEFAULT_STORY_LENGTH_MAX}
+              min={env.NEXT_PUBLIC_DEFAULT_STORY_LENGTH_MIN}
+              onChange={handleStoryLengthChange}
+              onBlur={handleStoryLengthBlur}
               className='w-auto min-w-[120px]'
             />
           </div>
