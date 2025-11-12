@@ -23,8 +23,8 @@ export const languages = [
 ];
 export const defaultTargetLanguage = 'Dutch';
 
-export const defaultStoryLength = 100;
-export const defaultStoryLengthMin = 20;
+export const defaultStoryLength = 300;
+export const defaultStoryLengthMin = 50;
 export const defaultStoryLengthMax = 1000;
 
 export const topicIdeas = [
@@ -50,6 +50,15 @@ export const topicIdeas = [
   'A technological mishap leads to a fortunate discovery',
   'Two people bond over their shared love of books',
   'A gardener witnesses the changing seasons and reflects on life',
+  'A musician finds inspiration in a new instrument',
+  'A scientist discovers a new theory that changes their understanding of the world',
+  'A chef discovers a new ingredient that changes their cooking style',
+  'A person discovers a new way to use technology to improve their life',
+  'A politician changes their attitude to life and makes a big difference in their community',
+  'A soldier must think fast and make a difficult decision',
+  'A student must overcome a fear to achieve their goal',
+  'An office worker rises to the occasion and saves the day and improves their career',
+  'A parent at home emerges from darkness and does what is right for their family',
 ];
 
 export const getRandomTopic = () => {
@@ -146,6 +155,12 @@ export const storyRequirements: StoryRequirements = {
     options: ['dialogue-heavy', 'narrative-heavy', 'balanced'],
     template: 'Uses a {value} balance between dialogue and narration',
     label: 'Dialogue Ratio',
+  },
+  perspective: {
+    count: 1,
+    options: ['first-person', 'third-person'],
+    template: 'Is written from the {value} perspective',
+    label: 'Perspective',
   },
 };
 
