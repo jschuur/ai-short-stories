@@ -1,6 +1,6 @@
 'use client';
 
-import { Loader2 } from 'lucide-react';
+import { Loader2, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -21,9 +21,9 @@ import {
   defaultDifficultyLevel,
   defaultLanguage,
   defaultStoryLength,
-  defaultTopic,
   difficultyLevels,
   languages,
+  topicIdeas,
 } from '@/config';
 
 interface StoryFormProps {
@@ -38,11 +38,15 @@ interface StoryFormProps {
   isLoading: boolean;
 }
 
+const getRandomTopic = () => {
+  return topicIdeas[Math.floor(Math.random() * topicIdeas.length)];
+};
+
 export function StoryForm({ onSubmit, isLoading }: StoryFormProps) {
   const [targetLanguage, setTargetLanguage] = useState(defaultLanguage);
   const [storyLength, setStoryLength] = useState(defaultStoryLength.toString());
   const [difficultyLevel, setDifficultyLevel] = useState(defaultDifficultyLevel);
-  const [topic, setTopic] = useState(defaultTopic);
+  const [topic, setTopic] = useState(getRandomTopic());
   const [includeVocabulary, setIncludeVocabulary] = useState(false);
   const [includeGrammarTips, setIncludeGrammarTips] = useState(false);
   const [error, setError] = useState('');
@@ -126,7 +130,19 @@ export function StoryForm({ onSubmit, isLoading }: StoryFormProps) {
         </div>
 
         <div className='space-y-2'>
-          <Label htmlFor='topic'>Topic</Label>
+          <div className='flex items-center gap-2'>
+            <Label htmlFor='topic'>Topic</Label>
+            <Button
+              type='button'
+              variant='ghost'
+              size='sm'
+              className='h-6 w-6 p-0'
+              onClick={() => setTopic(getRandomTopic())}
+              disabled={isLoading}
+            >
+              <RefreshCw className='h-3 w-3' />
+            </Button>
+          </div>
           <Textarea
             id='topic'
             placeholder='Describe the topic or theme for your story...'
@@ -134,6 +150,9 @@ export function StoryForm({ onSubmit, isLoading }: StoryFormProps) {
             onChange={(e) => setTopic(e.target.value)}
             rows={3}
           />
+          <p className='text-sm text-zinc-500 dark:text-zinc-400'>
+            Pick a random suggestion or enter your own
+          </p>
         </div>
 
         <div className='flex flex-col gap-4 sm:flex-row'>

@@ -15,6 +15,31 @@ export const defaultLanguage = 'Dutch';
 export const defaultStoryLength = 100;
 export const defaultTopic = 'A story about a journey to a new country';
 
+export const topicIdeas = [
+  'A story about a journey to a new country',
+  'An unexpected encounter at a local market',
+  'A day in the life of a street musician',
+  'A mysterious package arrives at the wrong address',
+  'Two strangers meet on a train and share their stories',
+  'A chef discovers a forgotten family recipe',
+  'Someone finds an old photograph in a second-hand book',
+  'A letter written decades ago is finally delivered',
+  'A person learns a new skill that changes their perspective',
+  'A scientist uses their knowledge to solve a big problem to save the world',
+  'An ordinary day turns extraordinary due to a small coincidence',
+  'A neighbour helps solve a puzzling problem',
+  'Someone revisits their childhood hometown after many years',
+  'An explorer finds beauty and wonder in the strangest place',
+  'A lost pet brings together an unlikely friendship',
+  'A café regular notices something unusual one morning',
+  'An aspiring artist finds inspiration in an unexpected place',
+  'A family tradition is questioned by the younger generation',
+  'Someone discovers a hidden talent during a crisis',
+  'A technological mishap leads to a fortunate discovery',
+  'Two people bond over their shared love of books',
+  'A gardener witnesses the changing seasons and reflects on life',
+];
+
 export type StoryRequirement = {
   count: number;
   options: (string | number)[];
