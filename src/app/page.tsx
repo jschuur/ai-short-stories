@@ -1,7 +1,7 @@
 'use client';
 
 import { useCompletion } from '@ai-sdk/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { StoryForm } from '@/components/StoryForm';
 import { StoryResponse } from '@/components/StoryResponse';
@@ -11,6 +11,8 @@ export default function Home() {
     targetLanguage: string;
     difficultyLevel: string;
   } | null>(null);
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const [endTime, setEndTime] = useState<number | null>(null);
 
   const { completion, complete, isLoading } = useCompletion({
     api: '/api/generate-story',
@@ -18,6 +20,12 @@ export default function Home() {
       console.error('Completion error:', err);
     },
   });
+
+  useEffect(() => {
+    if (!isLoading && startTime && !endTime) {
+      setEndTime(Date.now());
+    }
+  }, [isLoading, startTime, endTime]);
 
   const handleFormSubmit = async (data: {
     targetLanguage: string;
@@ -31,6 +39,8 @@ export default function Home() {
       targetLanguage: data.targetLanguage,
       difficultyLevel: data.difficultyLevel,
     });
+    setStartTime(Date.now());
+    setEndTime(null);
 
     await complete('', {
       body: {
@@ -64,6 +74,8 @@ export default function Home() {
             isLoading={isLoading}
             difficultyLevel={formData.difficultyLevel}
             targetLanguage={formData.targetLanguage}
+            startTime={startTime}
+            endTime={endTime}
           />
         )}
       </div>

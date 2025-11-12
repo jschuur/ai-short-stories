@@ -1,15 +1,18 @@
 'use client';
 
-import { Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
+import { StoryProgress } from '@/components/StoryProgress';
 
 interface StoryResponseProps {
   completion: string;
   isLoading: boolean;
   difficultyLevel: string;
   targetLanguage: string;
+  startTime: number | null;
+  endTime: number | null;
 }
 
 export function StoryResponse({
@@ -17,6 +20,8 @@ export function StoryResponse({
   isLoading,
   difficultyLevel,
   targetLanguage,
+  startTime,
+  endTime,
 }: StoryResponseProps) {
   if (!isLoading && !completion) return null;
 
@@ -29,15 +34,16 @@ export function StoryResponse({
             {difficultyLevel} level · {targetLanguage}
           </CardDescription>
         </div>
-        {completion && <div className='text-xs text-zinc-500'>{completion.length} chars</div>}
+        <StoryProgress
+          key={startTime}
+          completion={completion}
+          startTime={startTime}
+          endTime={endTime}
+          isLoading={isLoading}
+        />
       </CardHeader>
       <CardContent>
-        {isLoading && !completion ? (
-          <div className='flex items-center justify-center py-12 text-zinc-500'>
-            <Loader2 className='mr-2 h-6 w-6 animate-spin' />
-            <span>Preparing your story...</span>
-          </div>
-        ) : (
+        {completion && (
           <div className='prose prose-zinc max-w-none text-lg leading-relaxed dark:prose-invert [&>p]:mb-2'>
             <ReactMarkdown>{completion}</ReactMarkdown>
             {isLoading && (

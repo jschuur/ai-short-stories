@@ -3,7 +3,8 @@
     "allow": [
       "Bash(pnpm dlx:*)",
       "Bash(cat:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []

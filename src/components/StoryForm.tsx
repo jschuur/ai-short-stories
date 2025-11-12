@@ -1,6 +1,6 @@
 'use client';
 
-import { Loader2, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -185,14 +185,7 @@ export function StoryForm({ onSubmit, isLoading }: StoryFormProps) {
         )}
 
         <Button onClick={handleSubmit} disabled={isLoading} className='w-full' size='lg'>
-          {isLoading ? (
-            <>
-              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-              Generating Story...
-            </>
-          ) : (
-            'Generate Story'
-          )}
+          {isLoading ? <>Generating Story...</> : 'Generate Story'}
         </Button>
       </CardContent>
     </Card>
