@@ -1,0 +1,51 @@
+'use client';
+
+import { Loader2 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
+interface StoryResponseProps {
+  completion: string;
+  isLoading: boolean;
+  difficultyLevel: string;
+  targetLanguage: string;
+}
+
+export function StoryResponse({
+  completion,
+  isLoading,
+  difficultyLevel,
+  targetLanguage,
+}: StoryResponseProps) {
+  if (!isLoading && !completion) return null;
+
+  return (
+    <Card>
+      <CardHeader className='flex flex-row items-start justify-between space-y-0 pb-3'>
+        <div className='space-y-1.5'>
+          <CardTitle>Your Story</CardTitle>
+          <CardDescription>
+            {difficultyLevel} level · {targetLanguage}
+          </CardDescription>
+        </div>
+        {completion && <div className='text-xs text-zinc-500'>{completion.length} chars</div>}
+      </CardHeader>
+      <CardContent>
+        {isLoading && !completion ? (
+          <div className='flex items-center justify-center py-12 text-zinc-500'>
+            <Loader2 className='mr-2 h-6 w-6 animate-spin' />
+            <span>Preparing your story...</span>
+          </div>
+        ) : (
+          <div className='prose prose-zinc max-w-none text-lg leading-relaxed dark:prose-invert [&>p]:mb-2'>
+            <ReactMarkdown>{completion}</ReactMarkdown>
+            {isLoading && (
+              <span className='inline-block h-5 w-1 animate-pulse bg-zinc-900 dark:bg-zinc-100' />
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
