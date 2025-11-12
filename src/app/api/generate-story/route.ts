@@ -20,13 +20,21 @@ export async function POST(req: Request) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), { status: 400 });
     }
 
+    // Force disable if env vars are set
+    const finalIncludeVocabulary = env.NEXT_PUBLIC_DISABLE_VOCABULARY_CHECKBOX
+      ? false
+      : includeVocabulary || false;
+    const finalIncludeGrammarTips = env.NEXT_PUBLIC_DISABLE_GRAMMAR_CHECKBOX
+      ? false
+      : includeGrammarTips || false;
+
     const prompt = builtPrompt(
       targetLanguage,
       storyLength,
       difficultyLevel,
       topic,
-      includeVocabulary || false,
-      includeGrammarTips || false
+      finalIncludeVocabulary,
+      finalIncludeGrammarTips
     );
 
     const result = streamText({

@@ -41,11 +41,14 @@ export function StoryForm({ onSubmit, isLoading }: StoryFormProps) {
   const [storyLength, setStoryLength] = useState(env.NEXT_PUBLIC_DEFAULT_STORY_LENGTH.toString());
   const [difficultyLevel, setDifficultyLevel] = useState(env.NEXT_PUBLIC_DEFAULT_DIFFICULTY_LEVEL);
   const [topic, setTopic] = useState(env.NEXT_PUBLIC_DEFAULT_TOPIC || getRandomTopic());
+  const vocabularyDisabled = env.NEXT_PUBLIC_DISABLE_VOCABULARY_CHECKBOX;
+  const grammarDisabled = env.NEXT_PUBLIC_DISABLE_GRAMMAR_CHECKBOX;
+
   const [includeVocabulary, setIncludeVocabulary] = useState(
-    env.NEXT_PUBLIC_DEFAULT_INCLUDE_VOCABULARY
+    vocabularyDisabled ? false : env.NEXT_PUBLIC_DEFAULT_INCLUDE_VOCABULARY
   );
   const [includeGrammarTips, setIncludeGrammarTips] = useState(
-    env.NEXT_PUBLIC_DEFAULT_INCLUDE_GRAMMAR
+    grammarDisabled ? false : env.NEXT_PUBLIC_DEFAULT_INCLUDE_GRAMMAR
   );
   const [error, setError] = useState('');
 
@@ -64,8 +67,8 @@ export function StoryForm({ onSubmit, isLoading }: StoryFormProps) {
         storyLength: parseInt(storyLength),
         difficultyLevel,
         topic,
-        includeVocabulary,
-        includeGrammarTips,
+        includeVocabulary: vocabularyDisabled ? false : includeVocabulary,
+        includeGrammarTips: grammarDisabled ? false : includeGrammarTips,
       });
     } catch (err) {
       console.error('Form submission failed:', err);
@@ -159,8 +162,16 @@ export function StoryForm({ onSubmit, isLoading }: StoryFormProps) {
               id='include-vocabulary'
               checked={includeVocabulary}
               onChange={(e) => setIncludeVocabulary(e.target.checked)}
+              disabled={vocabularyDisabled}
             />
-            <Label htmlFor='include-vocabulary' className='cursor-pointer'>
+            <Label
+              htmlFor='include-vocabulary'
+              className={
+                vocabularyDisabled
+                  ? 'text-zinc-500 dark:text-zinc-400 cursor-not-allowed'
+                  : 'cursor-pointer'
+              }
+            >
               Include vocabulary
             </Label>
           </div>
@@ -169,8 +180,16 @@ export function StoryForm({ onSubmit, isLoading }: StoryFormProps) {
               id='include-grammar-tips'
               checked={includeGrammarTips}
               onChange={(e) => setIncludeGrammarTips(e.target.checked)}
+              disabled={grammarDisabled}
             />
-            <Label htmlFor='include-grammar-tips' className='cursor-pointer'>
+            <Label
+              htmlFor='include-grammar-tips'
+              className={
+                grammarDisabled
+                  ? 'text-zinc-500 dark:text-zinc-400 cursor-not-allowed'
+                  : 'cursor-pointer'
+              }
+            >
               Include grammar tips
             </Label>
           </div>

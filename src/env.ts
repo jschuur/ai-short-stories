@@ -28,6 +28,14 @@ export const env = createEnv({
       if (val === undefined || val === '') return false;
       return boolean(val as string);
     }, z.boolean().default(false)),
+    NEXT_PUBLIC_DISABLE_VOCABULARY_CHECKBOX: z.preprocess((val) => {
+      if (val === undefined || val === '') return false;
+      return boolean(val as string);
+    }, z.boolean().default(false)),
+    NEXT_PUBLIC_DISABLE_GRAMMAR_CHECKBOX: z.preprocess((val) => {
+      if (val === undefined || val === '') return false;
+      return boolean(val as string);
+    }, z.boolean().default(false)),
   },
   experimental__runtimeEnv: {
     NEXT_PUBLIC_DEFAULT_TARGET_LANGUAGE: process.env.NEXT_PUBLIC_DEFAULT_TARGET_LANGUAGE,
@@ -36,5 +44,7 @@ export const env = createEnv({
     NEXT_PUBLIC_DEFAULT_TOPIC: process.env.NEXT_PUBLIC_DEFAULT_TOPIC,
     NEXT_PUBLIC_DEFAULT_INCLUDE_VOCABULARY: process.env.NEXT_PUBLIC_DEFAULT_INCLUDE_VOCABULARY,
     NEXT_PUBLIC_DEFAULT_INCLUDE_GRAMMAR: process.env.NEXT_PUBLIC_DEFAULT_INCLUDE_GRAMMAR,
+    NEXT_PUBLIC_DISABLE_VOCABULARY_CHECKBOX: process.env.NEXT_PUBLIC_DISABLE_VOCABULARY_CHECKBOX,
+    NEXT_PUBLIC_DISABLE_GRAMMAR_CHECKBOX: process.env.NEXT_PUBLIC_DISABLE_GRAMMAR_CHECKBOX,
   },
 });
