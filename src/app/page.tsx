@@ -1,7 +1,7 @@
 'use client';
 
 import { useCompletion } from '@ai-sdk/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { StoryForm } from '@/components/StoryForm';
 import { StoryResponse } from '@/components/StoryResponse';
@@ -13,6 +13,7 @@ export default function Home() {
   } | null>(null);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
+  const prevIsLoadingRef = useRef<boolean>(false);
 
   const { completion, complete, isLoading } = useCompletion({
     api: '/api/generate-story',
@@ -22,9 +23,12 @@ export default function Home() {
   });
 
   useEffect(() => {
-    if (!isLoading && startTime && !endTime) {
-      setEndTime(Date.now());
+    if (prevIsLoadingRef.current && !isLoading && startTime && !endTime) {
+      queueMicrotask(() => {
+        setEndTime(Date.now());
+      });
     }
+    prevIsLoadingRef.current = isLoading;
   }, [isLoading, startTime, endTime]);
 
   const handleFormSubmit = async (data: {

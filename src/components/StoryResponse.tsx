@@ -6,6 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 
 import { StoryProgress } from '@/components/StoryProgress';
 
+import { markdownComponents } from '@/lib/markdown';
+
 interface StoryResponseProps {
   completion: string;
   isLoading: boolean;
@@ -45,7 +47,7 @@ export function StoryResponse({
       <CardContent>
         {completion && (
           <div className='prose prose-zinc max-w-none text-lg leading-relaxed dark:prose-invert [&>p]:mb-2'>
-            <ReactMarkdown>{completion}</ReactMarkdown>
+            <ReactMarkdown components={markdownComponents}>{completion}</ReactMarkdown>
             {isLoading && (
               <span className='inline-block h-5 w-1 animate-pulse bg-zinc-900 dark:bg-zinc-100' />
             )}

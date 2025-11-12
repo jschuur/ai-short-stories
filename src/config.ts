@@ -1,5 +1,3 @@
-export const defaultDifficultyLevel = 'B1';
-
 export const difficultyLevels: Record<string, string> = {
   A1: 'A1 (beginners)',
   A2: 'A2 (pre-intermediate)',
@@ -8,6 +6,7 @@ export const difficultyLevels: Record<string, string> = {
   C1: 'C1 (advanced)',
   C2: 'C2 (proficiency)',
 };
+export const defaultDifficultyLevel = 'B1';
 
 export const languages = [
   'German',
@@ -20,10 +19,9 @@ export const languages = [
   'Chinese',
   'Ukrainian',
 ];
-export const defaultLanguage = 'Dutch';
+export const defaultTargetLanguage = 'Dutch';
 
 export const defaultStoryLength = 100;
-export const defaultTopic = 'A story about a journey to a new country';
 
 export const topicIdeas = [
   'A story about a journey to a new country',

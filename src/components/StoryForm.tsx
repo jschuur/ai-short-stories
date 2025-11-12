@@ -17,14 +17,8 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 
-import {
-  defaultDifficultyLevel,
-  defaultLanguage,
-  defaultStoryLength,
-  difficultyLevels,
-  languages,
-  topicIdeas,
-} from '@/config';
+import { difficultyLevels, languages, topicIdeas } from '@/config';
+import { env } from '@/env';
 
 interface StoryFormProps {
   onSubmit: (data: {
@@ -43,12 +37,16 @@ const getRandomTopic = () => {
 };
 
 export function StoryForm({ onSubmit, isLoading }: StoryFormProps) {
-  const [targetLanguage, setTargetLanguage] = useState(defaultLanguage);
-  const [storyLength, setStoryLength] = useState(defaultStoryLength.toString());
-  const [difficultyLevel, setDifficultyLevel] = useState(defaultDifficultyLevel);
-  const [topic, setTopic] = useState(getRandomTopic());
-  const [includeVocabulary, setIncludeVocabulary] = useState(false);
-  const [includeGrammarTips, setIncludeGrammarTips] = useState(false);
+  const [targetLanguage, setTargetLanguage] = useState(env.NEXT_PUBLIC_DEFAULT_TARGET_LANGUAGE);
+  const [storyLength, setStoryLength] = useState(env.NEXT_PUBLIC_DEFAULT_STORY_LENGTH.toString());
+  const [difficultyLevel, setDifficultyLevel] = useState(env.NEXT_PUBLIC_DEFAULT_DIFFICULTY_LEVEL);
+  const [topic, setTopic] = useState(env.NEXT_PUBLIC_DEFAULT_TOPIC || getRandomTopic());
+  const [includeVocabulary, setIncludeVocabulary] = useState(
+    env.NEXT_PUBLIC_DEFAULT_INCLUDE_VOCABULARY
+  );
+  const [includeGrammarTips, setIncludeGrammarTips] = useState(
+    env.NEXT_PUBLIC_DEFAULT_INCLUDE_GRAMMAR
+  );
   const [error, setError] = useState('');
 
   const handleSubmit = async () => {
