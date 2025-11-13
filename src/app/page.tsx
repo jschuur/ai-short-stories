@@ -1,10 +1,18 @@
 'use client';
 
 import { useCompletion } from '@ai-sdk/react';
+import { useSetAtom } from 'jotai';
 import { useEffect, useRef, useState } from 'react';
 
 import { StoryForm } from '@/components/StoryForm';
 import { StoryResponse } from '@/components/StoryResponse';
+import { UsageStats } from '@/components/UsageStats';
+import {
+  completeStoryAtom,
+  resetSessionAtom,
+  startStoryAtom,
+  updateStoryUsageAtom,
+} from '@/store/usage';
 
 export default function Home() {
   const [formData, setFormData] = useState<{
@@ -15,6 +23,12 @@ export default function Home() {
   const [endTime, setEndTime] = useState<number | null>(null);
   const prevIsLoadingRef = useRef<boolean>(false);
 
+  // Usage tracking atoms
+  const startStory = useSetAtom(startStoryAtom);
+  const updateStoryUsage = useSetAtom(updateStoryUsageAtom);
+  const completeStory = useSetAtom(completeStoryAtom);
+  const resetSession = useSetAtom(resetSessionAtom);
+
   const { completion, complete, isLoading } = useCompletion({
     api: '/api/generate-story',
     onError: (err) => {
@@ -22,14 +36,39 @@ export default function Home() {
     },
   });
 
+  // Reset session stats on page load
+  useEffect(() => {
+    resetSession();
+  }, [resetSession]);
+
+  // Track when story generation completes
   useEffect(() => {
     if (prevIsLoadingRef.current && !isLoading && startTime && !endTime) {
       queueMicrotask(() => {
         setEndTime(Date.now());
+
+        // Finalize usage tracking
+        // Estimate tokens (rough approximation: 1 token ≈ 4 characters)
+        const estimatedTokens = Math.ceil(completion.length / 4);
+        completeStory({
+          characters: completion.length,
+          tokens: estimatedTokens,
+        });
       });
     }
     prevIsLoadingRef.current = isLoading;
-  }, [isLoading, startTime, endTime]);
+  }, [isLoading, startTime, endTime, completion.length, completeStory]);
+
+  // Update current story usage during streaming
+  useEffect(() => {
+    if (isLoading && completion.length > 0) {
+      const estimatedTokens = Math.ceil(completion.length / 4);
+      updateStoryUsage({
+        characters: completion.length,
+        tokens: estimatedTokens,
+      });
+    }
+  }, [completion.length, isLoading, updateStoryUsage]);
 
   const handleFormSubmit = async (data: {
     targetLanguage: string;
@@ -45,6 +84,9 @@ export default function Home() {
     });
     setStartTime(Date.now());
     setEndTime(null);
+
+    // Start tracking a new story
+    startStory();
 
     await complete('', {
       body: {
@@ -71,6 +113,8 @@ export default function Home() {
         </div>
 
         <StoryForm onSubmit={handleFormSubmit} isLoading={isLoading} />
+
+        <UsageStats />
 
         {(isLoading || completion) && formData && (
           <StoryResponse

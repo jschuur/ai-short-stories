@@ -21,6 +21,7 @@ export function StoryProgress({ completion, startTime, endTime, isLoading }: Sto
 
     if (endTime) {
       const totalSeconds = ((endTime - startTime) / 1000).toFixed(1);
+
       return <>{totalSeconds}s</>;
     }
 
