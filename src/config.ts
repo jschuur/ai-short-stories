@@ -165,3 +165,4 @@ export const storyRequirements: StoryRequirements = {
 };
 
 export const defaultAnthropicModel = 'claude-sonnet-4-5-20250929';
+export const defaultAnthropicUsageUrl = 'https://platform.claude.com/usage';
