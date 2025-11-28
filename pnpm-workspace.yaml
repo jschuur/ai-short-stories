@@ -1,2 +1,4 @@
 onlyBuiltDependencies:
   - aws-sdk
+  - sharp
+  - unrs-resolver

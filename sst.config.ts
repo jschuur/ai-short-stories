@@ -13,10 +13,15 @@ export default $config({
   async run() {
     const { env } = await import('./src/env');
 
+    const environment = Object.fromEntries(
+      Object.entries(env).map(([key, value]) => [key, String(value)])
+    );
+
     console.log('hostname: ', env.SITE_HOSTNAME);
 
     new sst.aws.Nextjs('Site', {
       domain: env.SITE_HOSTNAME,
+      environment,
       server: {
         timeout: '60 seconds',
       },

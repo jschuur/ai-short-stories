@@ -2,12 +2,13 @@
   "name": "ai-short-stories",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.24.0",
   "scripts": {
     "build": "next build",
     "dev": "next dev",
     "lint": "eslint",
     "start": "next start",
-    "deploy": "dotenv -e .env.production sst deploy"
+    "deploy": "dotenv -e .env.production sst deploy --stage production"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.44",
