@@ -17,8 +17,18 @@ export const env = createEnv({
     ANTHROPIC_API_KEY: z.string().min(1),
     ANTHROPIC_MODEL: z.string().min(4).default(defaultAnthropicModel),
     SITE_HOSTNAME: z.string().optional(),
+    DEBUG: z
+      .string()
+      .transform((val) => boolean(val))
+      .optional()
+      .default(false),
   },
   client: {
+    NEXT_PUBLIC_DEBUG: z
+      .string()
+      .transform((val) => boolean(val))
+      .optional()
+      .default(false),
     NEXT_PUBLIC_DEFAULT_TARGET_LANGUAGE: z.string().min(1).default(defaultTargetLanguage),
     NEXT_PUBLIC_DEFAULT_STORY_LENGTH: z.coerce.number().default(defaultStoryLength),
     NEXT_PUBLIC_DEFAULT_STORY_LENGTH_MIN: z.coerce.number().default(defaultStoryLengthMin),
@@ -44,6 +54,7 @@ export const env = createEnv({
     NEXT_PUBLIC_ANTHROPIC_USAGE_URL: z.string().default(defaultAnthropicUsageUrl),
   },
   experimental__runtimeEnv: {
+    NEXT_PUBLIC_DEBUG: process.env.DEBUG,
     NEXT_PUBLIC_DEFAULT_TARGET_LANGUAGE: process.env.NEXT_PUBLIC_DEFAULT_TARGET_LANGUAGE,
     NEXT_PUBLIC_DEFAULT_STORY_LENGTH: process.env.NEXT_PUBLIC_DEFAULT_STORY_LENGTH,
     NEXT_PUBLIC_DEFAULT_STORY_LENGTH_MIN: process.env.NEXT_PUBLIC_DEFAULT_STORY_LENGTH_MIN,

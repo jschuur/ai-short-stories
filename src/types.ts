@@ -1,4 +1,6 @@
-export type StoryRequirement = {
+import { storyRequirements } from '@/config';
+
+export type StoryRequirementOptions = {
   count: number;
   options: (string | number)[];
   template: string;

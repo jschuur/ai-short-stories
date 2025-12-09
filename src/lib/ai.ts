@@ -1,8 +1,9 @@
 import { storyRequirements } from '@/config';
+import { debug } from '@/lib/utils';
 
-import { StoryRequirement } from '@/types';
+import { StoryRequirementOptions } from '@/types';
 
-function buildStoryRequirements(config: StoryRequirement): (string | number)[] {
+function buildStoryRequirements(config: StoryRequirementOptions): (string | number)[] {
   if (config.options.length === 0) {
     throw new Error('No options available in configuration');
   }
@@ -73,11 +74,9 @@ Please create an engaging story that meets the following requirements:
 1. Uses vocabulary and grammar appropriate for ${difficultyLevel} CEFR level learners
 2. Is approximately ${storyLength} words long
 3. Relates to the topic: ${topic}
-${storyRequirementsList.map((req, index) => `${index + 4}. ${req}`).join('\n')}
-${storyRequirementsList.length + 4}. Is written entirely in ${targetLanguage}
-${
-  storyRequirementsList.length + 5
-}. Has a clear narrative structure with beginning, middle, and end. Do not add headings for the narrative structure sections.
+4. Is written entirely in ${targetLanguage}
+5. Has a clear narrative structure with beginning, middle, and end. Do not add headings for the narrative structure sections.
+${storyRequirementsList.map((req, index) => `${index + 6}. ${req}`).join('\n')}
 
 Give the story a title. Put the title at the beginning of the story as a heading.
 
@@ -92,7 +91,7 @@ ${
     : ''
 }`;
 
-  console.log(prompt);
+  debug(prompt);
 
-  return prompt;
+  return { prompt, storyRequirements: randomValues };
 }

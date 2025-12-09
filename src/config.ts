@@ -1,4 +1,4 @@
-import { StoryRequirements } from '@/types';
+import type { StoryRequirementOptions } from '@/types';
 
 export const difficultyLevels: Record<string, string> = {
   A1: 'A1 (beginners)',
@@ -65,7 +65,7 @@ export const getRandomTopic = () => {
   return topicIdeas[Math.floor(Math.random() * topicIdeas.length)];
 };
 
-export const storyRequirements: StoryRequirements = {
+export const storyRequirements = {
   tones: {
     count: 3,
     options: [
@@ -162,7 +162,7 @@ export const storyRequirements: StoryRequirements = {
     template: 'Is written from the {value} perspective',
     label: 'Perspective',
   },
-};
+} as const satisfies Record<string, StoryRequirementOptions>;
 
 export const defaultAnthropicModel = 'claude-sonnet-4-5-20250929';
 export const defaultAnthropicUsageUrl = 'https://platform.claude.com/usage';
