@@ -1,4 +1,4 @@
-import type { StoryRequirementOptions } from '@/types';
+import type { StoryRequirementOptions, SupportedLanguage } from '@/types';
 
 export const difficultyLevels: Record<string, string> = {
   A1: 'A1 (beginners)',
@@ -10,19 +10,62 @@ export const difficultyLevels: Record<string, string> = {
 };
 export const defaultDifficultyLevel = 'B1';
 
-export const languages = [
-  'German',
-  'Dutch',
-  'French',
-  'Spanish',
-  'English',
-  'Italian',
-  'Portuguese',
-  'Chinese',
-  'Ukrainian',
-  'Polish',
-];
-export const defaultTargetLanguage = 'Dutch';
+// https://docs.cloud.google.com/text-to-speech/docs/gemini-tts#available_languages
+export const supportedLanguages: SupportedLanguage[] = [
+  {
+    name: 'German',
+    languageCode: 'de-DE',
+    googleCloudTts: true,
+  },
+  {
+    name: 'Dutch',
+    languageCode: 'nl-NL',
+    googleCloudTts: true,
+  },
+  {
+    name: 'French',
+    languageCode: 'fr-FR',
+    googleCloudTts: true,
+  },
+  {
+    name: 'Spanish',
+    languageCode: 'es-ES',
+    googleCloudTts: true,
+  },
+  {
+    name: 'English',
+    languageCode: 'en-US',
+    googleCloudTts: true,
+  },
+  {
+    name: 'Italian',
+    languageCode: 'it-IT',
+    googleCloudTts: true,
+  },
+  {
+    name: 'Portuguese',
+    languageCode: 'pt-BR',
+    googleCloudTts: true,
+  },
+  {
+    name: 'Chinese',
+    languageCode: 'zh-CN',
+    googleCloudTts: false,
+  },
+  {
+    name: 'Ukrainian',
+    languageCode: 'uk-UA',
+    googleCloudTts: true,
+  },
+  {
+    name: 'Polish',
+    languageCode: 'pl-PL',
+    googleCloudTts: true,
+  },
+] as const;
+export const supportedLanguageCodes = supportedLanguages.map((lang) => lang.languageCode);
+
+export const defaultTargetLanguage = 'nl-NL';
 
 export const defaultStoryLength = 300;
 export const defaultStoryLengthMin = 50;
@@ -205,3 +248,17 @@ export const storyRequirementsConfig = {
 
 export const defaultAnthropicModel = 'claude-sonnet-4-5-20250929';
 export const defaultAnthropicUsageUrl = 'https://platform.claude.com/usage';
+
+export const defaultGoogleTtsVoice = 'Enceladus';
+// export const defaultGoogleTtsVoice = 'Callirrhoe';
+// export const defaultVoice = 'de-DE-Chirp3-HD-Enceladus';
+export const defaultGoogleTtsModelName = 'gemini-2.5-flash-tts';
+// expensive
+// export const defaultModelName = 'gemini-2.5-pro-tts';
+
+export const ttsPrompts = {
+  default:
+    "You're reading a short story for people learning a new language. Speak in a clear, natural voice. Don't speak too fast. Adjust your voice to the language of the story.",
+  normalspeed:
+    "You're reading a short story for people learning a new language. Speak in a clear, natural voice at normal speed. Adjust your voice to the language of the story.",
+} as const;

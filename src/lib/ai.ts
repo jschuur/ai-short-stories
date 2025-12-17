@@ -2,7 +2,7 @@ import { anthropic } from '@ai-sdk/anthropic';
 import { streamText } from 'ai';
 
 import { createStory, updateStory } from '@/db/queries';
-import { debug, extractStoryContent } from '@/lib/utils';
+import { debug, extractStoryContent, getLanguage } from '@/lib/utils';
 
 import { storyRequirementsConfig } from '@/config';
 import { env } from '@/env';
@@ -70,6 +70,8 @@ export function buildPrompt({
   const storyRequirements: StoryRequirements = {} as StoryRequirements;
   const storyRequirementsList: string[] = [];
 
+  const targetLanguageName = getLanguage({ languageCode: targetLanguage })?.name;
+
   for (const [key, config] of Object.entries(storyRequirementsConfig)) {
     const { requirement, formattedRequirement } = buildStoryRequirement(config);
 
@@ -77,14 +79,14 @@ export function buildPrompt({
     storyRequirementsList.push(formattedRequirement);
   }
 
-  const prompt = `Generate a short story in ${targetLanguage} for language learners.
+  const prompt = `Generate a short story in ${targetLanguageName} for language learners.
 
 Please create an engaging story that meets the following requirements:
 
 1. Uses vocabulary and grammar appropriate for ${difficultyLevel} CEFR level learners
 2. Is approximately ${storyLength} words long
 3. Relates to the topic: ${topic}
-4. Is written entirely in ${targetLanguage}
+4. Is written entirely in ${targetLanguageName}
 5. Has a clear narrative structure with beginning, middle, and end. Do not add headings for the narrative structure sections.
 ${storyRequirementsList.map((req, index) => `${index + 6}. ${req}`).join('\n')}
 

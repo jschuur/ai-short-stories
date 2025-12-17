@@ -1,11 +1,21 @@
 import { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { z } from 'zod';
 
-import { stories } from '@/db/schema';
-
-import { difficultyLevels, getRandomTopic, languages, storyRequirementsConfig } from '@/config';
+import {
+  difficultyLevels,
+  getRandomTopic,
+  storyRequirementsConfig,
+  supportedLanguageCodes,
+} from '@/config';
+import { audios, stories } from '@/db/schema';
 import { env } from '@/env';
+import { audioProviders } from '@/lib/tts';
 
+export type SupportedLanguage = {
+  languageCode: string;
+  name: string;
+  googleCloudTts: boolean;
+};
 export type Story = InferSelectModel<typeof stories>;
 export type CreateStory = InferInsertModel<typeof stories>;
 export type UpdateStory = Partial<CreateStory>;
@@ -25,7 +35,7 @@ export type StoryRequirementsConfig = Record<StoryRequirementType, StoryRequirem
 export type StoryRequirements = Record<StoryRequirementType, (string | number)[]>;
 
 export const storyRequestSchema = z.object({
-  targetLanguage: z.enum(languages as [string, ...string[]], {
+  targetLanguage: z.enum(supportedLanguageCodes as [string, ...string[]], {
     message: 'Invalid target language',
   }),
   storyLength: z.coerce
@@ -86,4 +96,16 @@ export type UsageStats = {
     tokens: number;
     requests: number;
   };
+};
+
+export type Audio = InferSelectModel<typeof audios>;
+export type CreateAudio = InferInsertModel<typeof audios>;
+export type UpdateAudio = Partial<CreateAudio>;
+
+export type AudioProvider = (typeof audioProviders)[number];
+
+export type AudioProviderSettings = {
+  voice: string;
+  model: string;
+  prompt: string;
 };

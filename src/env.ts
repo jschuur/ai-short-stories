@@ -20,6 +20,8 @@ export const env = createEnv({
     DATABASE_URL: z.string().min(1).default('file:./db/local.db'),
     DATABASE_AUTH_TOKEN: z.string().optional(),
     GOOGLE_CLOUD_PROJECT_ID: z.string().optional(),
+    GOOGLE_CLOUD_PRIVATE_KEY: z.string().optional(),
+    GOOGLE_CLOUD_CLIENT_EMAIL: z.string().optional(),
     DEBUG: z
       .string()
       .transform((val) => boolean(val))

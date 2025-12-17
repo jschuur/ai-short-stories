@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 
-import { difficultyLevels, getRandomTopic, languages } from '@/config';
+import { difficultyLevels, getRandomTopic, supportedLanguages } from '@/config';
 import { env } from '@/env';
 
 interface StoryFormProps {
@@ -111,13 +111,13 @@ export function StoryForm({ onSubmit, isLoading }: StoryFormProps) {
           <div className='space-y-2'>
             <Label htmlFor='language'>Target Language</Label>
             <Select value={targetLanguage} onValueChange={setTargetLanguage}>
-              <SelectTrigger id='language' className='w-auto min-w-[180px]'>
+              <SelectTrigger id='language' className='w-auto min-w-45'>
                 <SelectValue placeholder='Select language' />
               </SelectTrigger>
               <SelectContent>
-                {languages.map((language) => (
-                  <SelectItem key={language} value={language}>
-                    {language}
+                {supportedLanguages.map((language) => (
+                  <SelectItem key={language.languageCode} value={language.languageCode}>
+                    {language.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -134,14 +134,14 @@ export function StoryForm({ onSubmit, isLoading }: StoryFormProps) {
               min={env.NEXT_PUBLIC_DEFAULT_STORY_LENGTH_MIN}
               onChange={handleStoryLengthChange}
               onBlur={handleStoryLengthBlur}
-              className='w-auto min-w-[120px]'
+              className='w-auto min-w-30'
             />
           </div>
 
           <div className='space-y-2'>
             <Label htmlFor='difficulty'>Difficulty (CEFR)</Label>
             <Select value={difficultyLevel} onValueChange={setDifficultyLevel}>
-              <SelectTrigger id='difficulty' className='w-auto min-w-[140px]'>
+              <SelectTrigger id='difficulty' className='w-auto min-w-35'>
                 <SelectValue placeholder='Select level'>
                   {difficultyLevels[difficultyLevel]}
                 </SelectValue>

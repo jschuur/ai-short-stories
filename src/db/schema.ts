@@ -1,8 +1,10 @@
 import { randomUUID } from 'crypto';
+import { relations } from 'drizzle-orm';
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from 'drizzle-zod';
 
-import type { StoryRequirements } from '@/types';
+import { audioProviders } from '@/lib/tts';
+import type { AudioProviderSettings, StoryRequirements } from '@/types';
 
 export const stories = sqliteTable('stories', {
   id: text('id')
@@ -32,3 +34,38 @@ export const stories = sqliteTable('stories', {
 export const storySelectSchema = createSelectSchema(stories);
 export const storyInsertSchema = createInsertSchema(stories);
 export const storyUpdateSchema = createUpdateSchema(stories);
+
+export const audios = sqliteTable('audios', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => randomUUID()),
+  language: text('language', { length: 50 }).notNull(),
+  storyId: text('story_id').references(() => stories.id),
+  provider: text('provider', { enum: audioProviders }).notNull(),
+  // BUG: TablePlus (but not Drizzle Studio) crashes with 'The data couldn’t be read because it isn’t in the correct format.' error.
+  settings: text('settings', { mode: 'json' }).$type<AudioProviderSettings>().notNull(),
+  size: integer('size').notNull(),
+  timeToGenerate: integer('generate_time').notNull(),
+  filename: text('filename').notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp' })
+    .notNull()
+    .$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' })
+    .notNull()
+    .$defaultFn(() => new Date()),
+});
+
+export const audioSelectSchema = createSelectSchema(audios);
+export const audioInsertSchema = createInsertSchema(audios);
+export const audioUpdateSchema = createUpdateSchema(audios);
+
+export const storiesRelations = relations(stories, ({ many }) => ({
+  audios: many(audios),
+}));
+
+export const audiosRelations = relations(audios, ({ one }) => ({
+  story: one(stories, {
+    fields: [audios.storyId],
+    references: [stories.id],
+  }),
+}));

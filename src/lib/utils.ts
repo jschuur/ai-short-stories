@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
+import { supportedLanguages } from '@/config';
 import { env } from '@/env';
 
 export function cn(...inputs: ClassValue[]) {
@@ -37,4 +38,20 @@ export function extractStoryContent(text: string): { title: string | null; story
   }
 
   return { title: null, story: text.trim() };
+}
+
+type GetLanguageParams = {
+  languageCode?: string;
+  name?: string;
+};
+export function getLanguage({ languageCode, name }: GetLanguageParams) {
+  if (languageCode) return supportedLanguages.find((lang) => lang.languageCode === languageCode);
+
+  if (name) return supportedLanguages.find((lang) => lang.name === name);
+
+  return undefined;
+}
+
+export function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
