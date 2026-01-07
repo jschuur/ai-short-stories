@@ -1,7 +1,7 @@
 'use client';
 
 import { RefreshCw } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -36,16 +36,19 @@ export function StoryForm({ onSubmit, isLoading }: StoryFormProps) {
   const [targetLanguage, setTargetLanguage] = useState(env.NEXT_PUBLIC_DEFAULT_TARGET_LANGUAGE);
   const [storyLength, setStoryLength] = useState(env.NEXT_PUBLIC_DEFAULT_STORY_LENGTH.toString());
   const [difficultyLevel, setDifficultyLevel] = useState(env.NEXT_PUBLIC_DEFAULT_DIFFICULTY_LEVEL);
-  const [topic, setTopic] = useState<string>(() => {
-    // Only initialize on client side to avoid hydration mismatch
-    if (typeof window === 'undefined') return '';
+  const [topic, setTopic] = useState<string>('');
+  const [isClient, setIsClient] = useState(false);
 
+  useEffect(() => {
+    setIsClient(true);
     const defaultTopic = env.NEXT_PUBLIC_DEFAULT_TOPIC;
 
-    if (defaultTopic && defaultTopic.trim() && defaultTopic !== 'undefined') return defaultTopic;
-
-    return getRandomTopic();
-  });
+    if (defaultTopic && defaultTopic.trim() && defaultTopic !== 'undefined') {
+      setTopic(defaultTopic);
+    } else {
+      setTopic(getRandomTopic());
+    }
+  }, []);
   const vocabularyDisabled = env.NEXT_PUBLIC_DISABLE_VOCABULARY_CHECKBOX;
   const grammarDisabled = env.NEXT_PUBLIC_DISABLE_GRAMMAR_CHECKBOX;
 

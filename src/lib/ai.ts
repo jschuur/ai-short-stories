@@ -41,8 +41,10 @@ function buildStoryRequirement(config: StoryRequirementOptions): BuildStoryRequi
 }
 
 function renderTemplate(template: string, requirement: StoryRequirementValue): string {
+  if (!requirement || requirement.length === 0) return template;
+  
   const displayValue =
-    requirement && requirement.length > 1 ? requirement.join(', ') : String(requirement[0]);
+    requirement.length > 1 ? requirement.join(', ') : String(requirement[0]);
   const formatted = template.replace('{value}', displayValue);
 
   const count = typeof requirement[0] === 'number' ? requirement[0] : requirement.length;
@@ -108,7 +110,7 @@ ${
   return { prompt, storyRequirements };
 }
 
-export async function generateStoryStreaming(storyRequest: StoryRequest) {
+export async function generateStoryStreaming(storyRequest: StoryRequest): Promise<ReturnType<typeof streamText>> {
   let story: Story | null = null;
   let storyId: string | null = null;
 
@@ -127,6 +129,7 @@ export async function generateStoryStreaming(storyRequest: StoryRequest) {
     storyId = story.id;
   } catch (error) {
     console.warn('Error creating story:', error);
+    throw new Error('Failed to create story entry');
   }
 
   const result = streamText({
