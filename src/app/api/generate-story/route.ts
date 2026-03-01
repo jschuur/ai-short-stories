@@ -4,7 +4,7 @@ import { generateStoryStreaming } from '@/lib/ai';
 import { storyRequestSchema } from '@/types';
 
 export async function POST(req: Request) {
-  let storyId: string | null = null;
+  const storyId: string | null = null;
 
   try {
     const body = await req.json();

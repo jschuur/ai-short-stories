@@ -7,8 +7,6 @@ import { sleep } from '@/lib/utils';
 
 import { env } from '@/env';
 
-export const audioProviders = ['google-cloud-gemini-tts'] as const;
-
 export type GoogleCloudTTSOptions = {
   prompt?: string;
   text: string;

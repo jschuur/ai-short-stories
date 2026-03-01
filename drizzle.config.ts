@@ -1,6 +1,6 @@
 import { defineConfig } from 'drizzle-kit';
 
-import { env } from '@/env';
+import { env } from './src/env';
 
 console.log(`Using database URL: ${env.DATABASE_URL}`);
 

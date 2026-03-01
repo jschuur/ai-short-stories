@@ -262,3 +262,5 @@ export const ttsPrompts = {
   normalspeed:
     "You're reading a short story for people learning a new language. Speak in a clear, natural voice at normal speed. Adjust your voice to the language of the story.",
 } as const;
+
+export const audioProviders = ['google-cloud-gemini-tts'] as const;

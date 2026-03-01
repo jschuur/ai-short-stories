@@ -4,7 +4,11 @@
       "Bash(pnpm dlx:*)",
       "Bash(cat:*)",
       "Bash(tree:*)",
-      "WebSearch"
+      "WebSearch",
+      "WebFetch(domain:ai-sdk.dev)",
+      "Bash(npx:*)",
+      "Bash(pnpm check:*)",
+      "Bash(pnpm build:*)"
     ],
     "deny": [],
     "ask": []

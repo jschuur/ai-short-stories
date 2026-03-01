@@ -3,7 +3,8 @@ import { relations } from 'drizzle-orm';
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from 'drizzle-zod';
 
-import { audioProviders } from '@/lib/tts';
+import { audioProviders } from '@/config';
+
 import type { AudioProviderSettings, StoryRequirements } from '@/types';
 
 export const stories = sqliteTable('stories', {
@@ -21,6 +22,7 @@ export const stories = sqliteTable('stories', {
     .default('pending'),
   title: text('title'),
   story: text('story'),
+  wordCount: integer('word_count'),
   prompt: text('prompt'),
   errorMessage: text('error_message'),
   createdAt: integer('created_at', { mode: 'timestamp' })

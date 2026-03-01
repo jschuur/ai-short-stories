@@ -4,17 +4,17 @@ import { useCompletion } from '@ai-sdk/react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSetAtom } from 'jotai';
 import { useEffect, useRef, useState } from 'react';
-import ReactMarkdown from 'react-markdown';
+import { useParams, useRouter } from 'next/navigation';
 
 import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
 import { StoryForm } from '@/components/StoryForm';
 import { StoryList } from '@/components/StoryList';
 import { StoryResponse } from '@/components/StoryResponse';
 import { UsageStats } from '@/components/UsageStats';
-
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getLanguage } from '@/lib/utils';
+import ReactMarkdown from 'react-markdown';
+import type { Story } from '@/types';
 import {
   completeStoryAtom,
   resetSessionAtom,
@@ -22,9 +22,11 @@ import {
   updateStoryUsageAtom,
 } from '@/store/usage';
 
-import type { Story } from '@/types';
-
-export default function Home() {
+export default function StoryPage() {
+  const params = useParams();
+  const router = useRouter();
+  const storyId = params.id as string;
+  
   const [selectedStory, setSelectedStory] = useState<Story | null>(null);
   const [formData, setFormData] = useState<{
     targetLanguage: string;
@@ -33,61 +35,9 @@ export default function Home() {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<string>('stories');
-  const [storyIdFromUrl, setStoryIdFromUrl] = useState<string | null>(null);
   const prevIsLoadingRef = useRef<boolean>(false);
 
   const queryClient = useQueryClient();
-
-  // Extract story ID from URL on initial load
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const pathname = window.location.pathname;
-      if (pathname.startsWith('/story/')) {
-        const id = pathname.split('/')[2];
-        if (id) {
-          setStoryIdFromUrl(id);
-        }
-      }
-    }
-  }, []);
-
-  // Fetch story by ID if present in URL
-  const { data: storyData } = useQuery<Story>({
-    queryKey: ['story', storyIdFromUrl],
-    queryFn: async () => {
-      if (!storyIdFromUrl) return null;
-      const response = await fetch(`/api/stories/${storyIdFromUrl}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch story');
-      }
-      return response.json();
-    },
-    enabled: !!storyIdFromUrl,
-  });
-
-  // Auto-select story when data is loaded
-  useEffect(() => {
-    if (storyData && !selectedStory) {
-      setSelectedStory(storyData);
-    }
-  }, [storyData, selectedStory]);
-
-  // Only scroll to story on initial page load from URL, not on subsequent selections
-  useEffect(() => {
-    if (selectedStory && storyIdFromUrl) {
-      const timer = setTimeout(() => {
-        const storyCard = document.querySelector('[data-story-card]');
-        if (storyCard) {
-          storyCard.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-          });
-        }
-      }, 100);
-
-      return () => clearTimeout(timer);
-    }
-  }, [selectedStory, storyIdFromUrl]);
 
   // Usage tracking atoms
   const startStory = useSetAtom(startStoryAtom);
@@ -102,18 +52,23 @@ export default function Home() {
     },
   });
 
-  // Handle URL-based tab selection and prefetch stories
+  // Fetch specific story by ID
+  const { data: storyData, isLoading: storyLoading, error: storyError } = useQuery<Story>({
+    queryKey: ['story', storyId],
+    queryFn: async () => {
+      const response = await fetch(`/api/stories/${storyId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch story');
+      }
+      return response.json();
+    },
+    enabled: !!storyId,
+  });
+
+  // Reset session stats on page load and prefetch stories
   useEffect(() => {
     resetSession();
-
-    // Check if we should open generate tab via URL parameter or /new path
-    const isNewPath = typeof window !== 'undefined' && window.location.pathname === '/new';
-
-    if (isNewPath) {
-      setActiveTab('generate');
-      setSelectedStory(null);
-    }
-
+    
     // Prefetch all stories to populate React Query cache
     queryClient.prefetchQuery({
       queryKey: ['stories'],
@@ -126,6 +81,30 @@ export default function Home() {
       },
     });
   }, [resetSession, queryClient]);
+
+  // Auto-select story when data is loaded
+  useEffect(() => {
+    if (storyData && !selectedStory) {
+      setSelectedStory(storyData);
+    }
+  }, [storyData, selectedStory]);
+
+  // Scroll to story when selected
+  useEffect(() => {
+    if (selectedStory) {
+      const timer = setTimeout(() => {
+        const storyCard = document.querySelector('[data-story-card]');
+        if (storyCard) {
+          storyCard.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+          });
+        }
+      }, 100); // Small delay to ensure DOM is updated
+      
+      return () => clearTimeout(timer);
+    }
+  }, [selectedStory]);
 
   // Track when story generation completes
   useEffect(() => {
@@ -158,57 +137,6 @@ export default function Home() {
       });
     }
   }, [completion.length, isLoading, updateStoryUsage]);
-
-  // Scroll to story when selected
-  useEffect(() => {
-    if (selectedStory) {
-      const timer = setTimeout(() => {
-        const storyCard = document.querySelector('[data-story-card]');
-        if (storyCard) {
-          // Only scroll if we're not already near the story card
-          const rect = storyCard.getBoundingClientRect();
-          const isVisible = rect.top >= 0 && rect.top < window.innerHeight;
-
-          if (!isVisible) {
-            storyCard.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start',
-            });
-          }
-        }
-      }, 50); // Reduced delay for faster response
-
-      return () => clearTimeout(timer);
-    }
-  }, [selectedStory]);
-
-  // Handle browser back/forward navigation
-  useEffect(() => {
-    const handlePopState = (event: PopStateEvent) => {
-      const pathname = window.location.pathname;
-      if (pathname.startsWith('/story/')) {
-        const storyId = pathname.split('/')[2];
-        if (storyId) {
-          // Fetch and display the story
-          fetch(`/api/stories/${storyId}`)
-            .then((response) => response.json())
-            .then((story) => {
-              setSelectedStory(story);
-            })
-            .catch((error) => {
-              console.error('Error fetching story:', error);
-              setSelectedStory(null);
-            });
-        }
-      } else {
-        setSelectedStory(null);
-        setActiveTab('stories');
-      }
-    };
-
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
 
   const handleFormSubmit = async (data: {
     targetLanguage: string;
@@ -244,24 +172,43 @@ export default function Home() {
     setActiveTab(value);
     if (value === 'generate') {
       setSelectedStory(null);
-      // Update URL without full page navigation
-      window.history.pushState({}, '', '/new');
+      router.push('/new');
     } else {
-      // Update URL without full page navigation
-      window.history.pushState({}, '', '/');
+      router.push('/');
     }
   };
 
   const handleStorySelect = (story: Story) => {
-    // Don't do anything if the same story is already selected
-    if (selectedStory?.id === story.id) return;
-
     setSelectedStory(story);
-    setStoryIdFromUrl(null); // Clear URL-based story ID
-
-    // Update URL without scroll restoration
-    window.history.replaceState({ noScroll: true }, '', `/story/${story.id}`);
+    router.push(`/story/${story.id}`);
   };
+
+  if (storyLoading) {
+    return (
+      <div className='min-h-screen bg-linear-to-b from-blue-50 to-blue-100 py-12 px-4 dark:from-indigo-900 dark:to-fuchsia-950'>
+        <div className='mx-auto max-w-4xl'>
+          <div className="flex justify-center p-8">
+            <div className="flex items-center space-x-2">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+              <span>Loading story...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (storyError) {
+    return (
+      <div className='min-h-screen bg-linear-to-b from-blue-50 to-blue-100 py-12 px-4 dark:from-indigo-900 dark:to-fuchsia-950'>
+        <div className='mx-auto max-w-4xl'>
+          <div className="text-center p-8 text-red-600">
+            Failed to load story. <button onClick={() => router.push('/')} className="underline">Go back to stories</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='min-h-screen bg-linear-to-b from-blue-50 to-blue-100 py-12 px-4 dark:from-indigo-900 dark:to-fuchsia-950'>
@@ -317,10 +264,7 @@ export default function Home() {
                 <div className='flex justify-between items-start'>
                   <div className='flex flex-wrap gap-4 text-sm text-muted-foreground'>
                     <span className='font-medium text-foreground'>Language:</span>
-                    <span>
-                      {getLanguage({ languageCode: selectedStory.language })?.name ||
-                        selectedStory.language}
-                    </span>
+                    <span>{getLanguage({ languageCode: selectedStory.language })?.name || selectedStory.language}</span>
                     <span className='font-medium text-foreground'>Difficulty:</span>
                     <span className='capitalize'>{selectedStory.difficultyLevel}</span>
                     {selectedStory.wordCount && (
@@ -336,8 +280,7 @@ export default function Home() {
                     type='button'
                     onClick={() => {
                       setSelectedStory(null);
-                      // Update URL without full page navigation
-                      window.history.pushState({}, '', '/');
+                      router.push('/');
                     }}
                     className='text-muted-foreground hover:text-foreground transition-colors'
                   >

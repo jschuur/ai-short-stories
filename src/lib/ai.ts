@@ -2,7 +2,7 @@ import { anthropic } from '@ai-sdk/anthropic';
 import { streamText } from 'ai';
 
 import { createStory, updateStory } from '@/db/queries';
-import { debug, extractStoryContent, getLanguage } from '@/lib/utils';
+import { countWords, debug, extractStoryContent, getLanguage } from '@/lib/utils';
 
 import { storyRequirementsConfig } from '@/config';
 import { env } from '@/env';
@@ -139,10 +139,13 @@ export async function generateStoryStreaming(storyRequest: StoryRequest): Promis
       try {
         if (storyId) {
           const { title, story } = extractStoryContent(text);
+          const wordCount = countWords(story);
+          
           await updateStory({
             id: storyId,
             title,
             story,
+            wordCount,
             status: 'completed',
           });
         }

@@ -38,6 +38,10 @@ export async function getLastStory(): Promise<Story | null> {
   return res.length > 0 ? res[0] : null;
 }
 
+export async function getRecentStories(limit: number = 10): Promise<Story[]> {
+  return await db.select().from(stories).orderBy(desc(stories.createdAt)).limit(limit);
+}
+
 export async function createAudio(params: CreateAudio): Promise<Audio> {
   const [audio] = await db.insert(audios).values(params).returning();
 

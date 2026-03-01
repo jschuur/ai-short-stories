@@ -2,6 +2,7 @@ import { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { z } from 'zod';
 
 import {
+  audioProviders,
   difficultyLevels,
   getRandomTopic,
   storyRequirementsConfig,
@@ -9,7 +10,6 @@ import {
 } from '@/config';
 import { audios, stories } from '@/db/schema';
 import { env } from '@/env';
-import { audioProviders } from '@/lib/tts';
 
 export type SupportedLanguage = {
   languageCode: string;

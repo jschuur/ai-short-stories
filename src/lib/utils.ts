@@ -52,6 +52,44 @@ export function getLanguage({ languageCode, name }: GetLanguageParams) {
   return undefined;
 }
 
+export function countWords(text: string): number {
+  if (!text) return 0;
+
+  // Remove markdown formatting and count words
+  const cleanText = text
+    .replace(/^#{1,6}\s+.+$/gm, '') // Remove entire markdown header lines
+    .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold formatting
+    .replace(/\*(.*?)\*/g, '$1') // Remove italic formatting
+    .replace(/`(.*?)`/g, '$1') // Remove inline code
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Remove links, keep text
+    .replace(/^\s*[-*+]\s+/gm, '') // Remove list markers
+    .replace(/^\s*\d+\.\s+/gm, '') // Remove numbered list markers
+    .replace(/\n+/g, ' ') // Replace newlines with spaces
+    .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+    .trim();
+
+  // Split by spaces and filter out empty strings
+  const words = cleanText.split(' ').filter((word) => word.length > 0);
+
+  return words.length;
+}
+
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export function formatDate(date: Date): string {
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  };
+
+  const formatted = date.toLocaleDateString('en-US', options);
+
+  // Add ordinal suffix (1st, 2nd, 3rd, 4th, etc.)
+  const day = date.getDate();
+  const suffix = ['th', 'st', 'nd', 'rd'][Math.min((day - 1) % 10, 3)] || 'th';
+
+  return formatted.replace(/\d+/, `${day}${suffix}`);
 }
