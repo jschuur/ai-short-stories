@@ -12,16 +12,21 @@
     "check": "tsc --noEmit",
     "start": "next start",
     "deploy": "dotenv -e .env.production -- sst deploy --stage production",
+    "deploy:staging": "dotenv -e .env.staging -- sst deploy --stage staging",
     "db:init": "rm -rf db/local.* db/migrations/* && drizzle-kit generate && drizzle-kit migrate",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:migrate:prod": "dotenv -e .env.production -- drizzle-kit migrate",
+    "db:migrate:staging": "dotenv -e .env.staging -- drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "db:studio:prod": "dotenv -e .env.production -- drizzle-kit studio",
+    "db:studio:staging": "dotenv -e .env.staging -- drizzle-kit studio",
     "db:push": "drizzle-kit push",
     "db:push:prod": "dotenv -e .env.production -- drizzle-kit push",
+    "db:push:staging": "dotenv -e .env.staging -- drizzle-kit push",
     "generate:audio": "tsx scripts/generateAudio.ts --",
-    "generate:audio:prod": "dotenv -e .env.production -- tsx scripts/generateAudio.ts --"
+    "generate:audio:prod": "dotenv -e .env.production -- tsx scripts/generateAudio.ts --",
+    "generate:audio:staging": "dotenv -e .env.staging -- tsx scripts/generateAudio.ts --"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.50",
