@@ -1,5 +1,6 @@
 'use client';
 
+import { useForm } from '@tanstack/react-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   flexRender,
@@ -45,11 +46,18 @@ import { useAdminPreferences } from '@/hooks/useAdminPreferences';
 
 import type { TopicIdeaWithStoryCount } from '@/db/queries/settings';
 
+type TopicIdeaFormValues = {
+  topic: string;
+};
+
+const emptyForm: TopicIdeaFormValues = {
+  topic: '',
+};
+
 export function TopicIdeasTable() {
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [topic, setTopic] = useState('');
   const { topicIdeasSorting: sorting, setTopicIdeasSorting: setSorting } = useAdminPreferences();
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
@@ -93,20 +101,23 @@ export function TopicIdeasTable() {
     },
   });
 
+  const form = useForm({
+    defaultValues: emptyForm,
+    onSubmit: async ({ value }) => {
+      saveMutation.mutate({ id: editingId ?? undefined, topic: value.topic });
+    },
+  });
+
   const openCreate = () => {
     setEditingId(null);
-    setTopic('');
+    form.setFieldValue('topic', emptyForm.topic);
     setDialogOpen(true);
   };
 
   const openEdit = (idea: TopicIdeaWithStoryCount) => {
     setEditingId(idea.id);
-    setTopic(idea.topic);
+    form.setFieldValue('topic', idea.topic);
     setDialogOpen(true);
-  };
-
-  const handleSave = () => {
-    saveMutation.mutate({ id: editingId ?? undefined, topic });
   };
 
   const openDeleteConfirm = (id: string) => setDeleteTargetId(id);
@@ -202,22 +213,28 @@ export function TopicIdeasTable() {
             <DialogTitle>{editingId ? 'Edit Topic Idea' : 'Add Topic Idea'}</DialogTitle>
           </DialogHeader>
           <div className='space-y-4'>
-            <div className='space-y-2'>
-              <Label htmlFor='topic-text'>Topic</Label>
-              <Textarea
-                id='topic-text'
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                placeholder='e.g. A story about a journey to a new country'
-                rows={3}
-              />
-            </div>
+            <form.Field
+              name='topic'
+              children={(field) => (
+                <div className='space-y-2'>
+                  <Label htmlFor='topic-text'>Topic</Label>
+                  <Textarea
+                    id='topic-text'
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder='e.g. A story about a journey to a new country'
+                    rows={3}
+                  />
+                </div>
+              )}
+            />
           </div>
           <DialogFooter>
             <Button variant='outline' onClick={() => setDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSave} disabled={saveMutation.isPending}>
+            <Button onClick={() => form.handleSubmit()} disabled={saveMutation.isPending}>
               {saveMutation.isPending ? 'Saving...' : 'Save'}
             </Button>
           </DialogFooter>

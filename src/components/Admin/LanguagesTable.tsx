@@ -1,5 +1,6 @@
 'use client';
 
+import { useForm } from '@tanstack/react-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   flexRender,
@@ -46,14 +47,14 @@ import { useAdminPreferences } from '@/hooks/useAdminPreferences';
 
 import type { LanguageWithStoryCount } from '@/db/queries/settings';
 
-type LanguageForm = {
+type LanguageFormValues = {
   name: string;
   languageCode: string;
   googleCloudTts: boolean;
   active: boolean;
 };
 
-const emptyForm: LanguageForm = {
+const emptyForm: LanguageFormValues = {
   name: '',
   languageCode: '',
   googleCloudTts: false,
@@ -64,7 +65,6 @@ export function LanguagesTable() {
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState<LanguageForm>(emptyForm);
   const { languagesSorting: sorting, setLanguagesSorting: setSorting } = useAdminPreferences();
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
@@ -79,14 +79,17 @@ export function LanguagesTable() {
   });
 
   const saveMutation = useMutation({
-    mutationFn: async (data: LanguageForm & { id?: string }) => {
+    mutationFn: async (data: LanguageFormValues & { id?: string }) => {
       const url = data.id
         ? `/api/admin/settings/languages/${data.id}`
         : '/api/admin/settings/languages';
+      const body = data.id
+        ? { name: data.name, languageCode: data.languageCode, googleCloudTts: data.googleCloudTts, active: data.active }
+        : { name: data.name, languageCode: data.languageCode, googleCloudTts: data.googleCloudTts };
       const res = await fetch(url, {
         method: data.id ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify(body),
       });
       if (!res.ok) throw new Error('Failed to save');
 
@@ -127,25 +130,29 @@ export function LanguagesTable() {
     },
   });
 
+  const form = useForm({
+    defaultValues: emptyForm,
+    onSubmit: async ({ value }) => {
+      saveMutation.mutate({ ...value, id: editingId ?? undefined });
+    },
+  });
+
   const openCreate = () => {
     setEditingId(null);
-    setForm(emptyForm);
+    form.setFieldValue('name', emptyForm.name);
+    form.setFieldValue('languageCode', emptyForm.languageCode);
+    form.setFieldValue('googleCloudTts', emptyForm.googleCloudTts);
+    form.setFieldValue('active', emptyForm.active);
     setDialogOpen(true);
   };
 
   const openEdit = (lang: LanguageWithStoryCount) => {
     setEditingId(lang.id);
-    setForm({
-      name: lang.name,
-      languageCode: lang.languageCode,
-      googleCloudTts: lang.googleCloudTts,
-      active: lang.active,
-    });
+    form.setFieldValue('name', lang.name);
+    form.setFieldValue('languageCode', lang.languageCode);
+    form.setFieldValue('googleCloudTts', lang.googleCloudTts);
+    form.setFieldValue('active', lang.active);
     setDialogOpen(true);
-  };
-
-  const handleSave = () => {
-    saveMutation.mutate({ ...form, id: editingId ?? undefined });
   };
 
   const toggleActive = (id: string, active: boolean) => {
@@ -245,57 +252,82 @@ export function LanguagesTable() {
             <DialogTitle>{editingId ? 'Edit Language' : 'Add Language'}</DialogTitle>
           </DialogHeader>
           <div className='space-y-4'>
-            <div className='space-y-2'>
-              <Label htmlFor='lang-name'>Name</Label>
-              <Input
-                id='lang-name'
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder='e.g. German'
-              />
-            </div>
-            <div className='space-y-2'>
-              <Label htmlFor='lang-code'>Language Code</Label>
-              <Input
-                id='lang-code'
-                value={form.languageCode}
-                onChange={(e) => setForm({ ...form, languageCode: e.target.value })}
-                placeholder='e.g. de-DE'
-              />
-              <p className='text-xs text-muted-foreground'>
-                Use a{' '}
-                <a
-                  href='https://gist.github.com/typpo/b2b828a35e683b9bf8db91b5404f1bd1'
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='text-blue-500 hover:underline'
-                >
-                  BCP47 language tag
-                </a>
-              </p>
-            </div>
-            <div className='flex items-center gap-2'>
-              <Checkbox
-                id='lang-tts'
-                checked={form.googleCloudTts}
-                onChange={(e) => setForm({ ...form, googleCloudTts: e.target.checked })}
-              />
-              <Label htmlFor='lang-tts'>Google Cloud TTS supported</Label>
-            </div>
-            <div className='flex items-center gap-2'>
-              <Checkbox
-                id='lang-active'
-                checked={form.active}
-                onChange={(e) => setForm({ ...form, active: e.target.checked })}
-              />
-              <Label htmlFor='lang-active'>Active</Label>
-            </div>
+            <form.Field
+              name='name'
+              children={(field) => (
+                <div className='space-y-2'>
+                  <Label htmlFor='lang-name'>Name</Label>
+                  <Input
+                    id='lang-name'
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder='e.g. German'
+                  />
+                </div>
+              )}
+            />
+
+            <form.Field
+              name='languageCode'
+              children={(field) => (
+                <div className='space-y-2'>
+                  <Label htmlFor='lang-code'>Language Code</Label>
+                  <Input
+                    id='lang-code'
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder='e.g. de-DE'
+                  />
+                  <p className='text-xs text-muted-foreground'>
+                    Use a{' '}
+                    <a
+                      href='https://gist.github.com/typpo/b2b828a35e683b9bf8db91b5404f1bd1'
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      className='text-blue-500 hover:underline'
+                    >
+                      BCP47 language tag
+                    </a>
+                  </p>
+                </div>
+              )}
+            />
+
+            <form.Field
+              name='googleCloudTts'
+              children={(field) => (
+                <div className='flex items-center gap-2'>
+                  <Checkbox
+                    id='lang-tts'
+                    checked={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.checked)}
+                  />
+                  <Label htmlFor='lang-tts'>Google Cloud TTS supported</Label>
+                </div>
+              )}
+            />
+
+            <form.Field
+              name='active'
+              children={(field) => (
+                <div className='flex items-center gap-2'>
+                  <Checkbox
+                    id='lang-active'
+                    checked={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.checked)}
+                  />
+                  <Label htmlFor='lang-active'>Active</Label>
+                </div>
+              )}
+            />
           </div>
           <DialogFooter>
             <Button variant='outline' onClick={() => setDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSave} disabled={saveMutation.isPending}>
+            <Button onClick={() => form.handleSubmit()} disabled={saveMutation.isPending}>
               {saveMutation.isPending ? 'Saving...' : 'Save'}
             </Button>
           </DialogFooter>

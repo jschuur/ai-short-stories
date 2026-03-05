@@ -1,5 +1,6 @@
 'use client';
 
+import { useForm } from '@tanstack/react-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   flexRender,
@@ -46,7 +47,7 @@ import { useAdminPreferences } from '@/hooks/useAdminPreferences';
 
 import type { StoryRequirementCategory } from '@/db/queries/settings';
 
-type RequirementForm = {
+type RequirementFormValues = {
   key: string;
   label: string;
   count: number;
@@ -54,7 +55,7 @@ type RequirementForm = {
   options: string;
 };
 
-const emptyForm: RequirementForm = {
+const emptyForm: RequirementFormValues = {
   key: '',
   label: '',
   count: 1,
@@ -62,7 +63,7 @@ const emptyForm: RequirementForm = {
   options: '',
 };
 
-function formFromCategory(cat: StoryRequirementCategory): RequirementForm {
+function formFromCategory(cat: StoryRequirementCategory): RequirementFormValues {
   return {
     key: cat.key,
     label: cat.label,
@@ -88,7 +89,6 @@ export function StoryRequirementsTable() {
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState<RequirementForm>(emptyForm);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const { storyRequirementsSorting: sorting, setStoryRequirementsSorting: setSorting } =
     useAdminPreferences();
@@ -105,7 +105,7 @@ export function StoryRequirementsTable() {
 
   const saveMutation = useMutation({
     mutationFn: async (
-      data: { id?: string } & Omit<RequirementForm, 'options'> & { options: (string | number)[] },
+      data: { id?: string } & Omit<RequirementFormValues, 'options'> & { options: (string | number)[] },
     ) => {
       const url = data.id
         ? `/api/admin/settings/story-requirements/${data.id}`
@@ -139,28 +139,40 @@ export function StoryRequirementsTable() {
     },
   });
 
+  const form = useForm({
+    defaultValues: emptyForm,
+    onSubmit: async ({ value }) => {
+      const options = parseOptions(value.options);
+      saveMutation.mutate({
+        id: editingId ?? undefined,
+        key: value.key,
+        label: value.label,
+        count: value.count,
+        template: value.template,
+        options,
+      });
+    },
+  });
+
   const openCreate = () => {
     setEditingId(null);
-    setForm(emptyForm);
+    form.setFieldValue('key', emptyForm.key);
+    form.setFieldValue('label', emptyForm.label);
+    form.setFieldValue('count', emptyForm.count);
+    form.setFieldValue('template', emptyForm.template);
+    form.setFieldValue('options', emptyForm.options);
     setDialogOpen(true);
   };
 
   const openEdit = (cat: StoryRequirementCategory) => {
+    const values = formFromCategory(cat);
     setEditingId(cat.id);
-    setForm(formFromCategory(cat));
+    form.setFieldValue('key', values.key);
+    form.setFieldValue('label', values.label);
+    form.setFieldValue('count', values.count);
+    form.setFieldValue('template', values.template);
+    form.setFieldValue('options', values.options);
     setDialogOpen(true);
-  };
-
-  const handleSave = () => {
-    const options = parseOptions(form.options);
-    saveMutation.mutate({
-      id: editingId ?? undefined,
-      key: form.key,
-      label: form.label,
-      count: form.count,
-      template: form.template,
-      options,
-    });
   };
 
   const openDeleteConfirm = (id: string) => setDeleteTargetId(id);
@@ -261,65 +273,99 @@ export function StoryRequirementsTable() {
           </DialogHeader>
           <div className='space-y-4'>
             <div className='grid grid-cols-2 gap-4'>
-              <div className='space-y-2'>
-                <Label htmlFor='req-key'>Key</Label>
-                <Input
-                  id='req-key'
-                  value={form.key}
-                  onChange={(e) => setForm({ ...form, key: e.target.value })}
-                  placeholder='e.g. tones'
-                />
-              </div>
-              <div className='space-y-2'>
-                <Label htmlFor='req-label'>Label</Label>
-                <Input
-                  id='req-label'
-                  value={form.label}
-                  onChange={(e) => setForm({ ...form, label: e.target.value })}
-                  placeholder='e.g. Tones to incorporate'
-                />
-              </div>
-            </div>
-            <div className='space-y-2'>
-              <Label htmlFor='req-count'>Pick Count</Label>
-              <Input
-                id='req-count'
-                type='number'
-                min={1}
-                value={form.count}
-                onChange={(e) => setForm({ ...form, count: parseInt(e.target.value) || 1 })}
+              <form.Field
+                name='key'
+                children={(field) => (
+                  <div className='space-y-2'>
+                    <Label htmlFor='req-key'>Key</Label>
+                    <Input
+                      id='req-key'
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder='e.g. tones'
+                    />
+                  </div>
+                )}
+              />
+
+              <form.Field
+                name='label'
+                children={(field) => (
+                  <div className='space-y-2'>
+                    <Label htmlFor='req-label'>Label</Label>
+                    <Input
+                      id='req-label'
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder='e.g. Tones to incorporate'
+                    />
+                  </div>
+                )}
               />
             </div>
-            <div className='space-y-2'>
-              <Label htmlFor='req-template'>Template</Label>
-              <Input
-                id='req-template'
-                value={form.template}
-                onChange={(e) => setForm({ ...form, template: e.target.value })}
-                placeholder='e.g. Use these tones: {value}'
-              />
-              <p className='text-xs text-muted-foreground'>
-                Use {'{value}'} for the selected option(s) and {'{plural}'} for conditional plural
-                suffix.
-              </p>
-            </div>
-            <div className='space-y-2'>
-              <Label htmlFor='req-options'>Options (one per line)</Label>
-              <Textarea
-                id='req-options'
-                value={form.options}
-                onChange={(e) => setForm({ ...form, options: e.target.value })}
-                placeholder={'excitement\nanger\njoy'}
-                rows={3}
-                className='min-h-[5.5rem] max-h-[8.5rem] overflow-y-auto'
-              />
-            </div>
+
+            <form.Field
+              name='count'
+              children={(field) => (
+                <div className='space-y-2'>
+                  <Label htmlFor='req-count'>Pick Count</Label>
+                  <Input
+                    id='req-count'
+                    type='number'
+                    min={1}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(parseInt(e.target.value) || 1)}
+                  />
+                </div>
+              )}
+            />
+
+            <form.Field
+              name='template'
+              children={(field) => (
+                <div className='space-y-2'>
+                  <Label htmlFor='req-template'>Template</Label>
+                  <Input
+                    id='req-template'
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder='e.g. Use these tones: {value}'
+                  />
+                  <p className='text-xs text-muted-foreground'>
+                    Use {'{value}'} for the selected option(s) and {'{plural}'} for conditional plural
+                    suffix.
+                  </p>
+                </div>
+              )}
+            />
+
+            <form.Field
+              name='options'
+              children={(field) => (
+                <div className='space-y-2'>
+                  <Label htmlFor='req-options'>Options (one per line)</Label>
+                  <Textarea
+                    id='req-options'
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder={'excitement\nanger\njoy'}
+                    rows={3}
+                    className='min-h-22 max-h-34 overflow-y-auto'
+                  />
+                </div>
+              )}
+            />
           </div>
           <DialogFooter>
             <Button variant='outline' onClick={() => setDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSave} disabled={saveMutation.isPending}>
+            <Button onClick={() => form.handleSubmit()} disabled={saveMutation.isPending}>
               {saveMutation.isPending ? 'Saving...' : 'Save'}
             </Button>
           </DialogFooter>
