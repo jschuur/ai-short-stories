@@ -2,43 +2,33 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getRecentStories, getStoriesPaginated } from '@/db/queries';
 
+import { storiesQuerySchema } from '@/types';
+
 export async function GET(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const paginated = searchParams.get('paginated');
+    const query = Object.fromEntries(request.nextUrl.searchParams.entries());
+    const queryResult = storiesQuerySchema.safeParse(query);
 
-    if (paginated === 'true') {
-      const page = parseInt(searchParams.get('page') || '1');
-      const pageSize = parseInt(searchParams.get('pageSize') || '10');
-      const sortBy = searchParams.get('sortBy') || 'updatedAt';
-      const sortOrder = (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc';
-      const language = searchParams.get('language') || undefined;
-      const difficulty = searchParams.get('difficulty') || undefined;
-      const lengthRange = searchParams.get('lengthRange') || undefined;
-      const createdWithinDays = searchParams.get('createdWithinDays')
-        ? parseInt(searchParams.get('createdWithinDays')!)
-        : undefined;
+    if (!queryResult.success)
+      return NextResponse.json(
+        { error: 'Invalid query parameters', details: queryResult.error.issues },
+        { status: 400 },
+      );
 
-      const result = await getStoriesPaginated({
-        page,
-        pageSize,
-        sortBy,
-        sortOrder,
-        language,
-        difficulty,
-        lengthRange,
-        createdWithinDays,
-      });
+    const params = queryResult.data;
+
+    if (params.paginated === 'true') {
+      const result = await getStoriesPaginated(params);
 
       return NextResponse.json(result);
     }
 
-    const limit = parseInt(searchParams.get('limit') || '10');
-    const stories = await getRecentStories(limit);
+    const stories = await getRecentStories(params.limit);
 
     return NextResponse.json({ stories });
   } catch (error) {
     console.error('Failed to fetch stories:', error);
+
     return NextResponse.json({ error: 'Failed to fetch stories' }, { status: 500 });
   }
 }

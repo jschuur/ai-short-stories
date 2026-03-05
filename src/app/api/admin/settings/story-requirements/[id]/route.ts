@@ -6,24 +6,61 @@ import {
 } from '@/db/queries/settings';
 import { requireAdmin } from '@/lib/admin';
 
+import { routeIdParamSchema, updateStoryRequirementCategoryBodySchema } from '@/types';
+
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const adminCheck = await requireAdmin();
-  if ('error' in adminCheck) return adminCheck.error;
+  try {
+    const adminCheck = await requireAdmin();
+    if ('error' in adminCheck) return adminCheck.error;
 
-  const { id } = await params;
-  const body = await req.json();
+    const paramResult = routeIdParamSchema.safeParse(await params);
+    if (!paramResult.success)
+      return NextResponse.json(
+        { error: 'Invalid route parameters', details: paramResult.error.issues },
+        { status: 400 },
+      );
 
-  const category = await updateStoryRequirementCategory(id, body);
+    const bodyResult = updateStoryRequirementCategoryBodySchema.safeParse(await req.json());
+    if (!bodyResult.success)
+      return NextResponse.json(
+        { error: 'Invalid request body', details: bodyResult.error.issues },
+        { status: 400 },
+      );
 
-  return NextResponse.json(category);
+    const category = await updateStoryRequirementCategory(paramResult.data.id, bodyResult.data);
+
+    return NextResponse.json(category);
+  } catch (error) {
+    console.error('Failed to update story requirement category:', error);
+
+    return NextResponse.json(
+      { error: 'Failed to update story requirement category' },
+      { status: 500 },
+    );
+  }
 }
 
 export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const adminCheck = await requireAdmin();
-  if ('error' in adminCheck) return adminCheck.error;
+  try {
+    const adminCheck = await requireAdmin();
+    if ('error' in adminCheck) return adminCheck.error;
 
-  const { id } = await params;
-  await deleteStoryRequirementCategory(id);
+    const paramResult = routeIdParamSchema.safeParse(await params);
+    if (!paramResult.success)
+      return NextResponse.json(
+        { error: 'Invalid route parameters', details: paramResult.error.issues },
+        { status: 400 },
+      );
 
-  return NextResponse.json({ success: true });
+    await deleteStoryRequirementCategory(paramResult.data.id);
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Failed to delete story requirement category:', error);
+
+    return NextResponse.json(
+      { error: 'Failed to delete story requirement category' },
+      { status: 500 },
+    );
+  }
 }

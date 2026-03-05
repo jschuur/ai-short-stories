@@ -3,30 +3,41 @@ import { NextResponse } from 'next/server';
 import { createLanguage, getLanguagesWithStoryCounts } from '@/db/queries/settings';
 import { requireAdmin } from '@/lib/admin';
 
+import { createLanguageBodySchema } from '@/types';
+
 export async function GET() {
-  const adminCheck = await requireAdmin();
-  if ('error' in adminCheck) return adminCheck.error;
+  try {
+    const adminCheck = await requireAdmin();
+    if ('error' in adminCheck) return adminCheck.error;
 
-  const languages = await getLanguagesWithStoryCounts();
+    const languages = await getLanguagesWithStoryCounts();
 
-  return NextResponse.json(languages);
+    return NextResponse.json(languages);
+  } catch (error) {
+    console.error('Failed to fetch languages:', error);
+
+    return NextResponse.json({ error: 'Failed to fetch languages' }, { status: 500 });
+  }
 }
 
 export async function POST(req: Request) {
-  const adminCheck = await requireAdmin();
-  if ('error' in adminCheck) return adminCheck.error;
+  try {
+    const adminCheck = await requireAdmin();
+    if ('error' in adminCheck) return adminCheck.error;
 
-  const body = await req.json();
-  const { name, languageCode, googleCloudTts } = body;
+    const bodyResult = createLanguageBodySchema.safeParse(await req.json());
+    if (!bodyResult.success)
+      return NextResponse.json(
+        { error: 'Invalid request body', details: bodyResult.error.issues },
+        { status: 400 },
+      );
 
-  if (!name || !languageCode)
-    return NextResponse.json({ error: 'Name and language code are required' }, { status: 400 });
+    const language = await createLanguage(bodyResult.data);
 
-  const language = await createLanguage({
-    name,
-    languageCode,
-    googleCloudTts: googleCloudTts ?? false,
-  });
+    return NextResponse.json(language, { status: 201 });
+  } catch (error) {
+    console.error('Failed to create language:', error);
 
-  return NextResponse.json(language, { status: 201 });
+    return NextResponse.json({ error: 'Failed to create language' }, { status: 500 });
+  }
 }
