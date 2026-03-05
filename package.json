@@ -32,8 +32,8 @@
     "generate:audio:staging": "dotenv -e .env.staging -- tsx scripts/generateAudio.ts --"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^3.0.50",
-    "@ai-sdk/react": "^3.0.107",
+    "@ai-sdk/anthropic": "^3.0.58",
+    "@ai-sdk/react": "^3.0.118",
     "@google-cloud/text-to-speech": "^6.4.0",
     "@libsql/client": "^0.17.0",
     "@libsql/linux-x64-gnu": "^0.5.22",
@@ -45,8 +45,8 @@
     "@tanstack/react-form": "^1.28.4",
     "@tanstack/react-query": "^5.90.21",
     "@tanstack/react-table": "^8.21.3",
-    "ai": "^6.0.105",
-    "better-auth": "^1.5.1",
+    "ai": "^6.0.116",
+    "better-auth": "^1.5.3",
     "boolean": "^3.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
